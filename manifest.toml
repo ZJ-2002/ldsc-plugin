@@ -84,9 +84,13 @@ info_min = { type = "number", default = 0.9, doc = "Minimum INFO score" }
 maf_min = { type = "number", default = 0.01, doc = "Minimum MAF" }
 n_min = { type = "number", optional = true, doc = "Override minimum sample-size" }
 nstudy_min = { type = "number", optional = true, doc = "Minimum study count" }
-daner = { type = "bool", optional = true, doc = "Parse Stephan Ripke daner format" }
-daner_n = { type = "bool", optional = true, doc = "Parse newer daner format with Nca/Nco" }
-a1_is_a2 = { type = "bool", optional = true, doc = "Treat A1 and A2 as identical" }
+# fix-review R04 (2026-10-05): presence-semantics switches — type "flag",
+# not "bool". flag=false (or absent) renders an empty env value so
+# munge.sh's `[ -n "$LDSC_MUNGE_*" ]` omits the CLI switch; the old
+# "bool" typing rendered a non-empty "false" and appended e.g. --daner.
+daner = { type = "flag", optional = true, doc = "Parse Stephan Ripke daner format" }
+daner_n = { type = "flag", optional = true, doc = "Parse newer daner format with Nca/Nco" }
+a1_is_a2 = { type = "flag", optional = true, doc = "Treat A1 and A2 as identical" }
 
 [nodes.command]
 interpreter = "sh"
