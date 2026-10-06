@@ -2,7 +2,7 @@ schema_version = 1
 plugin_name = "ldsc"
 
 [image]
-reference = "ghcr.io/auto-nomics/autonomics/ldsc@sha256:2dad70a9583f93db1dcc9a560b7d5b309af4a5151dfaf615f80d059a0925d78c"
+reference = "ghcr.io/zj-2002/ldsc@sha256:93b2542386a08df10402045b8036ff4da6733bea65324d50e326d035579d247a"
 tag = "3.0.1-allele-filter"
 upstream = "CBIIT LDSC continuation 3.0.1 @ 6c67395"
 license = "BSD-3-Clause"

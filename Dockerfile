@@ -17,27 +17,25 @@ COPY ldscore/ ./ldscore/
 
 # LDSC 3.0.1 filters incompatible allele pairs but passes the pre-filter
 # allele Series to alignment, so any rejected row still raises KeyError.
-# Keep the official source as the build context and apply this minimal fix
-# deterministically; the assertion prevents a silent upstream code drift.
+# The original build context (/mnt/disk3/ldsc3/ldsc, pristine upstream)
+# is not portable; the vendored ldsc-python3/ tree already carries the
+# fix in refactored naming (filter_alleles/select_and_log, no leading
+# underscore, merged_sumstats instead of loop). Assert the fixed form so
+# a code drift that regresses the allele-index fix still fails the build.
 RUN python - <<'PY'
 from pathlib import Path
 
 path = Path("/opt/ldsc/ldscore/sumstats.py")
 text = path.read_text()
-old = """\
-        loop = _select_and_log(loop, _filter_alleles(alleles), log,
-                               '{N} SNPs with valid alleles.')
-        loop['Z2'] = _align_alleles(loop.Z2, alleles)
+fixed = """\
+        valid_indices = filter_alleles(alleles)
+        merged_sumstats = select_and_log(merged_sumstats, valid_indices, logger, "{N} SNPs with valid alleles.")
+        merged_sumstats["Z2"] = align_alleles(
+            merged_sumstats.Z2, alleles[valid_indices]
+        )
 """
-new = """\
-        valid_indices = _filter_alleles(alleles)
-        loop = _select_and_log(loop, valid_indices, log,
-                               '{N} SNPs with valid alleles.')
-        loop['Z2'] = _align_alleles(loop.Z2, alleles[valid_indices])
-"""
-if old not in text:
-    raise SystemExit("expected LDSC 3.0.1 allele-filter block was not found")
-path.write_text(text.replace(old, new, 1))
+if fixed not in text:
+    raise SystemExit("fixed LDSC 3.0.1 allele-filter block was not found")
 PY
 
 RUN chmod +x /opt/ldsc/ldsc.py /opt/ldsc/munge_sumstats.py \
